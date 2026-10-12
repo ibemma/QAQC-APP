@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
   <meta name="description" content="Hallmark QAQC - Composite Repair Engineering Quality Assurance">
   <meta name="theme-color" content="#C8102E">
   <link rel="manifest" href="manifest.webmanifest">
@@ -60,6 +61,21 @@
       }
     }
     * { box-sizing: border-box; }
+    /* ===== NATIVE-APP FEEL: no pinch / double-tap zoom, no rubber-band pull-to-refresh,
+       no text-selection callouts on the interface, no grey tap flash ===== */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overscroll-behavior: none; }
+    html, body, #app, .content { overscroll-behavior: none; }
+    * { touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent; }
+    body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+    input, textarea, select { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+    img { -webkit-user-drag: none; user-drag: none; }
+    button, .btn, .wizard-step, .photo-upload { -webkit-user-select: none; user-select: none; }
+    /* iOS zooms the page when a field under 16px is focused: keep inputs at 16px on touch devices */
+    @media (pointer: coarse), (hover: none), (max-width: 820px) { .input, .select, .textarea, .modal-input { font-size: 16px !important; } }
+    /* Notch / status bar / home-indicator safe areas when launched as an installed app */
+    .header { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+    #app { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+    .content { padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
     html, body { height: 100%; margin: 0; }
     body {
       background: var(--bg);
@@ -69,7 +85,12 @@
       flex-direction: column;
       transition: background 0.25s ease, color 0.25s ease;
     }
-    #app { flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    #app { flex: 1; display: flex; flex-direction: column; min-height: 0; height: 100vh; height: 100dvh; overflow: hidden; }
+    /* Fixed app shell like a native app: the page itself never scrolls or bounces (so there is nothing
+       to pull-to-refresh); header stays put and only the content area scrolls. */
+    html, body { overflow: hidden; position: fixed; inset: 0; width: 100%; }
+    .top-sticky, .breadcrumb { flex-shrink: 0; }
+    .content { min-height: 0; overscroll-behavior: contain; }
     
     /* ===== HEADER ===== */
     .header {
@@ -103,7 +124,7 @@
     .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     
     @media (max-width: 420px) {
-      .header { padding: 10px 12px; gap: 10px; }
+      .header { padding: 10px 12px; gap: 10px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
       .logo-mark { width: 34px; height: 34px; border-radius: 8px; }
       .header-text h1 { font-size: 13px; }
       .header-text p { font-size: 9px; }
@@ -320,18 +341,18 @@
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
     
     .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-      background: var(--text); color: var(--bg); padding: 14px 22px; border-radius: 12px;
-      box-shadow: var(--shadow-lg); z-index: 1000; max-width: 340px; font-size: 14px; font-weight: 600;
-      animation: toastIn 0.25s ease;
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: var(--text); color: var(--bg); padding: 16px 24px; border-radius: 14px; text-align: center;
+      box-shadow: var(--shadow-lg); z-index: 1400; width: max-content; max-width: min(340px, calc(100vw - 40px)); font-size: 14px; font-weight: 600;
+      pointer-events: none; animation: toastIn 0.25s ease;
     }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
     .toast.success { background: var(--success); color: white; }
     .toast.error { background: var(--error); color: white; }
     .toast.warning { background: var(--warning); color: white; }
     
     /* ===== CENTERED MODAL SYSTEM (replaces browser confirm/alert/prompt) ===== */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 1200; padding: 20px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100dvh; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 1200; padding: 20px; box-sizing: border-box; }
     .modal-card { background: var(--surface); border-radius: 16px; padding: 20px; max-width: 340px; width: 100%; border-top: 4px solid var(--primary); box-shadow: 0 10px 34px rgba(0,0,0,0.3); max-height: 85vh; overflow-y: auto; }
     .modal-title { font-weight: 800; font-size: 16px; margin-bottom: 8px; color: var(--text); }
     .modal-message { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px; white-space: pre-line; }
@@ -399,9 +420,10 @@
     }
     .line-item-delete:hover { background: rgba(239,68,68,0.1); color: var(--error); border-color: rgba(239,68,68,0.3); }
     
+    #newLineFormOverlay.open { display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; box-sizing: border-box; }
     .new-line-modal {
       background: var(--surface); border-radius: var(--radius); padding: 24px;
-      max-width: 420px; width: 90%; margin: 60px auto; box-shadow: var(--shadow-lg);
+      max-width: 420px; width: 90%; margin: auto; box-shadow: var(--shadow-lg); max-height: 92vh; max-height: 92dvh; overflow-y: auto;
     }
     
     /* ===== PDF PREVIEW ===== */
@@ -424,7 +446,7 @@
     .preview-frame-wrap {
       background: #6b6b6b; border-radius: var(--radius); padding: 16px;
       overflow: auto; -webkit-overflow-scrolling: touch;
-      touch-action: pan-x pan-y pinch-zoom;
+      touch-action: pan-x pan-y;
       max-height: 75vh;
     }
     .preview-frame-scaler {
@@ -1397,6 +1419,7 @@
 </div>
 
 <div id="modalRoot"></div>
+<div id="installRoot"></div>
 
 <script>
 // ==================== STATE MANAGEMENT ====================
@@ -1477,8 +1500,8 @@ function updateSettingsInfo() {
   document.getElementById('settingsFieldCount').textContent = pct + '%';
 }
 
-function clearAllData() {
-  if (!confirm('This will permanently delete all inspection data, photos, and signatures. This cannot be undone. Continue?')) return;
+async function clearAllData() {
+  if (!(await customConfirm('Delete all data?', 'This will permanently delete all inspection data, photos, and signatures. This cannot be undone.', 'Cancel', 'Delete all'))) return;
   localStorage.removeItem('qaqc_inspection');
   showToast('✓ All data cleared. Reloading...', 'success');
   setTimeout(() => location.reload(), 1000);
@@ -4204,6 +4227,87 @@ function showToast(message, type = 'info') {
   
   setTimeout(() => toast.remove(), 3000);
 }
+
+// ==================== APP-LIKE BEHAVIOUR ====================
+// iOS Safari ignores user-scalable=no, so pinch zoom is blocked explicitly (double-tap zoom is
+// already disabled by touch-action in the stylesheet).
+(function () {
+  const stop = (e) => { if (e.cancelable) e.preventDefault(); };
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, stop, { passive: false }));
+  document.addEventListener('touchmove', (e) => { if (e.touches && e.touches.length > 1) stop(e); }, { passive: false });
+  // Rubber-band guard (iOS): a drag that starts in a scroller already at its top/bottom edge is
+  // swallowed, so the screen never stretches or gives the "about to refresh" pull.
+  let startY = 0, startX = 0;
+  document.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { startY = e.touches[0].clientY; startX = e.touches[0].clientX; } }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1) return;
+    const dy = e.touches[0].clientY - startY, dx = e.touches[0].clientX - startX;
+    if (Math.abs(dy) < Math.abs(dx)) return;              // horizontal drags (preview, tab scroll) are left alone
+    let el = e.target;
+    while (el && el !== document.body) {
+      const cs = getComputedStyle(el);
+      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) {
+        const atTop = el.scrollTop <= 0, atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+        if ((dy > 0 && atTop) || (dy < 0 && atBottom)) { if (e.cancelable) e.preventDefault(); }
+        return;                                           // the scroller can still move this way: let it
+      }
+      el = el.parentElement;
+    }
+    if (e.cancelable) e.preventDefault();                 // nothing scrollable under the finger
+  }, { passive: false });
+  // No long-press / right-click browser menu on the interface (text fields keep theirs for copy & paste)
+  document.addEventListener('contextmenu', (e) => {
+    if (!(e.target.closest && e.target.closest('input, textarea'))) stop(e);
+  });
+})();
+
+// ==================== INSTALL AS APP POPUP ====================
+// Android / desktop Chrome & Edge: the browser's own install prompt is captured and shown in our
+// centred dialog. iPhone / iPad Safari has no install API, so the dialog shows the 2-step instructions.
+// Shown on every visit until the app is installed; "Not now" hides it for the rest of this visit only.
+let deferredInstallPrompt = null;
+function isRunningAsInstalledApp() {
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+}
+function isIosDevice() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function installDismissedThisVisit() { try { return sessionStorage.getItem('qaqc_install_dismissed') === '1'; } catch (e) { return false; } }
+function closeInstallPopup() { const r = document.getElementById('installRoot'); if (r) r.innerHTML = ''; }
+function dismissInstallPopup() { try { sessionStorage.setItem('qaqc_install_dismissed', '1'); } catch (e) {} closeInstallPopup(); }
+async function runInstall() {
+  if (!deferredInstallPrompt) return dismissInstallPopup();
+  const p = deferredInstallPrompt; deferredInstallPrompt = null; closeInstallPopup();
+  try { p.prompt(); await p.userChoice; } catch (e) { /* user closed the browser prompt */ }
+}
+function showInstallPopup() {
+  if (isRunningAsInstalledApp() || installDismissedThisVisit() || document.getElementById('installOverlayEl')) return;
+  const ios = isIosDevice() && !deferredInstallPrompt;
+  if (!ios && !deferredInstallPrompt) return;
+  // Never stack on top of another dialog: try again shortly.
+  const mr = document.getElementById('modalRoot');
+  if (mr && mr.innerHTML.trim()) { setTimeout(showInstallPopup, 2500); return; }
+  const body = ios
+    ? `<div class="modal-message" style="margin-bottom:12px;">Add Hallmark QAQC to your Home Screen to open it like a normal app, full screen and offline:</div>
+       <ol style="margin:0 0 16px 18px;padding:0;font-size:14px;line-height:1.7;color:var(--text);">
+         <li>Tap the <b>Share</b> button <span aria-hidden="true">&#x2B06;&#xFE0E;</span> in Safari's toolbar</li>
+         <li>Scroll down and tap <b>Add to Home Screen</b></li>
+         <li>Tap <b>Add</b></li>
+       </ol>
+       <div class="modal-btn-row"><button class="modal-btn confirm" style="width:100%;" onclick="dismissInstallPopup()">Got it</button></div>`
+    : `<div class="modal-message">Install Hallmark QAQC on this device to open it like a normal app, full screen, with quick access and offline use.</div>
+       <div class="modal-btn-row">
+         <button class="modal-btn cancel" onclick="dismissInstallPopup()">Not now</button>
+         <button class="modal-btn confirm" onclick="runInstall()">Install</button>
+       </div>`;
+  document.getElementById('installRoot').innerHTML = `<div class="modal-overlay" id="installOverlayEl" style="z-index:1250;"><div class="modal-card" style="text-align:center;">
+    <img src="${HALLMARK_LOGO_APP}" alt="" style="width:56px;height:56px;border-radius:12px;margin:0 auto 10px;display:block;">
+    <div class="modal-title">Install Hallmark QAQC</div>
+    <div style="text-align:${ios ? 'left' : 'center'};">${body}</div></div></div>`;
+}
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstallPrompt = e; setTimeout(showInstallPopup, 1200); });
+window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; closeInstallPopup(); showToast('App installed', 'success'); });
+window.addEventListener('load', () => { if (isIosDevice() && !isRunningAsInstalledApp()) setTimeout(showInstallPopup, 2000); });
 
 // ==================== CUSTOM MODAL SYSTEM (replaces browser confirm/alert/prompt) ====================
 function openModalHTML(html) {
