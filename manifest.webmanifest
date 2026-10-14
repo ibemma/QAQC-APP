@@ -6,7 +6,7 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
+  "background_color": "#C8102E",
   "theme_color": "#C8102E",
   "icons": [
     {
@@ -31,5 +31,6 @@
   "display_override": [
     "standalone"
   ],
-  "prefers_related_applications": false
+  "prefers_related_applications": false,
+  "id": "./index.html"
 }
