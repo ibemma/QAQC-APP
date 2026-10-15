@@ -34,6 +34,15 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Hallmark QAQC">
+  <link rel="apple-touch-startup-image" href="splash/s-1536x2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2048x1536.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/s-1260x2736.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-1668x2420.png" media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2420x1668.png" media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/s-2064x2752.png" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2752x2064.png" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="splash/s-1488x2266.png" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2266x1488.png" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <link rel="apple-touch-startup-image" href="splash/s-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="splash/s-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="splash/s-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
@@ -46,10 +55,15 @@
   <link rel="apple-touch-startup-image" href="splash/s-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="splash/s-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="splash/s-2048x2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2732x2048.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <link rel="apple-touch-startup-image" href="splash/s-1668x2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2388x1668.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <link rel="apple-touch-startup-image" href="splash/s-1668x2224.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2224x1668.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <link rel="apple-touch-startup-image" href="splash/s-1640x2360.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2360x1640.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <link rel="apple-touch-startup-image" href="splash/s-1620x2160.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="splash/s-2160x1620.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   <title>Hallmark QAQC - Composite Repair Engineering</title>
   <script defer src="vendor/html2pdf.bundle.min.js"></script>
   <script defer src="vendor/jszip.min.js"></script>
@@ -3669,8 +3683,20 @@ function buildGridTable(colWidthsTwips, rows, tableOpts) {
     rowsXml.push(wRow([rowXml], { heightTwips, cantSplit: true, pageBreakBefore: rowCells.pageBreakBefore }));
   });
 
+  // "Ruler" row: a 1pt-high, borderless, transparent row with one cell per grid column, each holding a
+  // transparent picture exactly as wide as its column. Word ignores it visually, but apps that lay tables
+  // out by content (iOS Quick Look / WhatsApp preview) shrink columns to their text and ignore the declared
+  // widths. A picture can't be shrunk, so this pins every column to its true width there.
+  if (RULER && RULER.rId) {
+    const rc = colWidthsTwips.map(w => wCell(
+      `<w:p><w:pPr><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr>` +
+      RULER.reg.drawing(RULER.rId, Math.max(1, Math.floor(w / 15) - 1), 1, 'column ruler', { tiny: true }) + `</w:p>`,
+      { widthTwips: w, noBorders: true, padV: 0, padH: 0, valign: 'top' }));
+    rowsXml.unshift(`<w:tr><w:trPr><w:trHeight w:val="20" w:hRule="exact"/><w:cantSplit/></w:trPr>${rc.join('')}</w:tr>`);
+  }
   return wTable(colWidthsTwips, rowsXml, tableOpts);
 }
+let RULER = null;
 
 // trHeight in Word is measured border-to-border PLUS the row's bottom border; the browser's <tr> height already contains it.
 // Measured: Word/LibreOffice rows came out 0.5px (~8 twips) taller than the PDF's, which over ~40 rows on page 1 overflowed the page.
@@ -3760,6 +3786,7 @@ async function makeBannerImage() {
 
 function setupWordCheckboxes(reg) {
   try {
+    RULER = { reg, rId: reg.registerImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') };
     CB_WORD = { reg, on: reg.registerImage(makeCheckboxDataUri(true)), off: reg.registerImage(makeCheckboxDataUri(false)) };
   } catch (e) { CB_WORD = null; }
 }
