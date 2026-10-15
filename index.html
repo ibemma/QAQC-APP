@@ -1,7 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background:#C8102E">
 <head>
   <meta charset="UTF-8">
+  <style>
+    /* ===== LAUNCH SPLASH (pure HTML/CSS so it paints instantly, before any script runs) ===== */
+    html { background: #C8102E; }
+    #splash { position: fixed; inset: 0; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(120% 90% at 50% 18%, #E63950 0%, #C8102E 45%, #8E0A20 100%); color: #fff;
+      opacity: 1; transition: opacity .45s ease, visibility .45s ease; text-align: center; padding: 24px; }
+    #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    #splash .sp-card { width: 112px; height: 112px; border-radius: 26px; background: #fff; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 18px 40px rgba(0,0,0,.28); animation: spIn .6s cubic-bezier(.2,.8,.2,1) both; }
+    #splash .sp-card img { width: 88px; height: 88px; display: block; }
+    #splash .sp-title { margin-top: 26px; font-size: 22px; font-weight: 800; letter-spacing: .01em; animation: spUp .6s .1s ease both; }
+    #splash .sp-sub { margin-top: 6px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; opacity: .85; animation: spUp .6s .18s ease both; }
+    #splash .sp-bar { margin-top: 34px; width: 140px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.25); overflow: hidden; }
+    #splash .sp-bar i { display: block; height: 100%; width: 100%; border-radius: 3px; background: #fff; transform-origin: left center; transform: scaleX(0); animation: spBar 10s cubic-bezier(.3,.1,.3,1) forwards; }
+    #splash .sp-foot { position: absolute; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; font-size: 11px; letter-spacing: .08em; opacity: .7; }
+    @keyframes spIn { from { transform: scale(.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes spUp { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes spBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @media (prefers-reduced-motion: reduce) { #splash *, #splash { animation: none !important; transition: none !important; } }
+
+  </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="Hallmark QAQC - Composite Repair Engineering Quality Assurance">
@@ -30,8 +51,8 @@
   <link rel="apple-touch-startup-image" href="splash/s-1640x2360.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="splash/s-1620x2160.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
   <title>Hallmark QAQC - Composite Repair Engineering</title>
-  <script src="vendor/html2pdf.bundle.min.js"></script>
-  <script src="vendor/jszip.min.js"></script>
+  <script defer src="vendor/html2pdf.bundle.min.js"></script>
+  <script defer src="vendor/jszip.min.js"></script>
   <style>
     /* Carlito = metric-identical to Calibri. iPhones/iPads/Macs have no Calibri, so without it the
        report text came out wider there and the banner/labels wrapped differently from Windows & Android. */
@@ -421,25 +442,6 @@
     .breadcrumb-text { font-weight: 600; color: var(--text); }
     
 
-    /* ===== LAUNCH SPLASH (pure HTML/CSS so it paints instantly, before any script runs) ===== */
-    html { background: #C8102E; }
-    #splash { position: fixed; inset: 0; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: radial-gradient(120% 90% at 50% 18%, #E63950 0%, #C8102E 45%, #8E0A20 100%); color: #fff;
-      opacity: 1; transition: opacity .45s ease, visibility .45s ease; text-align: center; padding: 24px; }
-    #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-    #splash .sp-card { width: 112px; height: 112px; border-radius: 26px; background: #fff; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 18px 40px rgba(0,0,0,.28); animation: spIn .6s cubic-bezier(.2,.8,.2,1) both; }
-    #splash .sp-card img { width: 88px; height: 88px; display: block; }
-    #splash .sp-title { margin-top: 26px; font-size: 22px; font-weight: 800; letter-spacing: .01em; animation: spUp .6s .1s ease both; }
-    #splash .sp-sub { margin-top: 6px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; opacity: .85; animation: spUp .6s .18s ease both; }
-    #splash .sp-bar { margin-top: 34px; width: 140px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.25); overflow: hidden; }
-    #splash .sp-bar i { display: block; height: 100%; width: 40%; border-radius: 3px; background: #fff; animation: spBar 1.1s ease-in-out infinite; }
-    #splash .sp-foot { position: absolute; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; font-size: 11px; letter-spacing: .08em; opacity: .7; }
-    @keyframes spIn { from { transform: scale(.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes spUp { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
-    @keyframes spBar { 0% { transform: translateX(-110%); } 100% { transform: translateX(350%); } }
-    @media (prefers-reduced-motion: reduce) { #splash *, #splash { animation: none !important; transition: none !important; } }
-
     /* ===== SEARCH ===== */
     .search-wrap { position: relative; margin: -8px 0 18px; }
     .search-wrap .s-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-dim); pointer-events: none; }
@@ -541,7 +543,6 @@
   <div class="sp-title">Composite Repair Engineering</div>
   <div class="sp-sub">QAQC Documentation System</div>
   <div class="sp-bar"><i></i></div>
-  <div class="sp-foot">HALLMARK</div>
 </div>
 <div id="app">
   <div class="top-sticky">
@@ -1610,14 +1611,15 @@ window.addEventListener('load', () => {
   hideSplash();
 });
 
-// Keep the splash up at least ~0.9s (so it never just flashes), then fade it out and remove it.
+// Keep the splash up for a full 10 seconds from launch, like a native app, then fade it out and remove it.
+const SPLASH_MIN_MS = 10000;
 function hideSplash() {
   const sp = document.getElementById('splash');
   if (!sp) return;
-  const wait = Math.max(0, 900 - (performance.now ? performance.now() : 0));
+  const wait = Math.max(0, SPLASH_MIN_MS - (performance.now ? performance.now() : 0));
   setTimeout(() => { sp.classList.add('hide'); setTimeout(() => { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 600); }, wait);
 }
-setTimeout(hideSplash, 6000); // safety net
+setTimeout(hideSplash, 15000); // safety net
 
 // ==================== MEDIA STORE (IndexedDB) ====================
 // Photos and signatures live in IndexedDB (hundreds of MB available). localStorage has a ~5 MB
@@ -3736,6 +3738,26 @@ function makeCheckboxDataUri(checked) {
   return c.toDataURL('image/png');
 }
 
+// Banner as ONE flat picture (red bar + white title + logo), drawn to the same geometry as the PDF header.
+// Floating shapes/text boxes are not supported by iOS Quick Look, Pages or Google Docs (the bar, title and logo
+// came out torn apart there); a picture renders identically everywhere, including Word.
+async function makeBannerImage() {
+  const W = 794, H = 108, S = 4;
+  const c = document.createElement('canvas'); c.width = W * S; c.height = H * S;
+  const g = c.getContext('2d'); g.scale(S, S);
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+  const barW = W * 0.586, r = 7;
+  g.fillStyle = '#FF0000'; g.beginPath();
+  g.moveTo(0, 32); g.lineTo(barW - r, 32); g.arcTo(barW, 32, barW, 32 + r, r); g.lineTo(barW, 72 - r); g.arcTo(barW, 72, barW - r, 72, r); g.lineTo(0, 72); g.closePath(); g.fill();
+  try { await document.fonts.load('bold 18.667px Carlito'); } catch (e) {}
+  g.fillStyle = '#ffffff'; g.font = 'bold 18.667px Calibri, Carlito, Arial, sans-serif'; g.textBaseline = 'middle';
+  g.fillText('COMPOSITE REPAIR ENGINEERING / QAQC REPORT', 38, 52.5);
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = HALLMARK_LOGO_PDF; });
+  const lw = 245, lh = lw * img.naturalHeight / img.naturalWidth;
+  g.drawImage(img, W - 28 - lw, 23, lw, lh);
+  return c.toDataURL('image/png');
+}
+
 function setupWordCheckboxes(reg) {
   try {
     CB_WORD = { reg, on: reg.registerImage(makeCheckboxDataUri(true)), off: reg.registerImage(makeCheckboxDataUri(false)) };
@@ -4282,7 +4304,7 @@ function pageBreak() {
 // A thin spacer paragraph between tables (tables butt against each other with margin:0
 // in the original; a zero-height paragraph keeps Word from merging adjacent tables into one).
 function spacer(twips) {
-  return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="${twips || 20}" w:lineRule="exact"/></w:pPr></w:p>`;
+  return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="${twips || 20}" w:lineRule="exact"/><w:rPr><w:color w:val="FFFFFF"/><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>`;
 }
 
 // ---- Word <-> PDF fidelity helpers ----
@@ -4377,7 +4399,7 @@ const BLUE_BANNER = { shade: '5081C1', size: 28, align: 'left', padH: 150 };    
 // A real next-page section break. It replaces the old page-break paragraph / row-level pageBreakBefore: the new page
 // starts at its very top in every Word version and nothing is left behind on it (no phantom blank line, no blank page).
 function sectionBreak(topTwipsOfEndingSection) {
-  return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>${sectPrXml(topTwipsOfEndingSection)}</w:pPr></w:p>`;
+  return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:rPr><w:color w:val="FFFFFF"/><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr>${sectPrXml(topTwipsOfEndingSection)}</w:pPr></w:p>`;
 }
 
 async function downloadWord() {
@@ -4421,9 +4443,16 @@ async function downloadWord() {
     // Header banner (matches the manual QAQC form): red rounded bar + white title + Hallmark
     // logo, all anchored to the physical page. The top page margin is 0 (see TOP_MARGIN_TWIPS),
     // and the banner paragraph reserves its own height so the header table starts below it.
-    const headerLogoRId = reg.registerImage(HALLMARK_LOGO_PDF);
-    const headerImgXml = reg.headerBanner(headerLogoRId,
-      wPara(wRun('COMPOSITE REPAIR ENGINEERING / QAQC REPORT', { size: 28, bold: true, color: 'FFFFFF' }), { align: 'left' }));
+    let headerImgXml;
+    try {
+      const bannerRId = reg.registerImage(await makeBannerImage());
+      // Full page width (794px = 11906 twips), pulled out over both page margins; tiny font so the line adds no height.
+      headerImgXml = `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:left="-420" w:right="-420"/><w:jc w:val="left"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr>${reg.drawing(bannerRId, 794, 108, 'Hallmark report header', { tiny: true })}</w:p>`;
+    } catch (e) {
+      const headerLogoRId = reg.registerImage(HALLMARK_LOGO_PDF);
+      headerImgXml = reg.headerBanner(headerLogoRId,
+        wPara(wRun('COMPOSITE REPAIR ENGINEERING / QAQC REPORT', { size: 28, bold: true, color: 'FFFFFF' }), { align: 'left' }));
+    }
 
     const hdrRows = buildHeaderRows(fields);
     hdrRows.push([bannerRowDesc('PRE-REPAIR QUALITY CHECKS', { ...YELLOW_BANNER, colspan: 5 })]);
