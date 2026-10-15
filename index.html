@@ -3688,10 +3688,11 @@ function buildGridTable(colWidthsTwips, rows, tableOpts) {
   // out by content (iOS Quick Look / WhatsApp preview) shrink columns to their text and ignore the declared
   // widths. A picture can't be shrunk, so this pins every column to its true width there.
   if (RULER && RULER.rId) {
-    const rc = colWidthsTwips.map(w => wCell(
+    let cum = 0;
+    const rc = colWidthsTwips.map(w => { const px = Math.max(1, Math.round((cum + w) / 15) - Math.round(cum / 15)); cum += w; return wCell(
       `<w:p><w:pPr><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr>` +
-      RULER.reg.drawing(RULER.rId, Math.max(1, Math.floor(w / 15) - 1), 1, 'column ruler', { tiny: true }) + `</w:p>`,
-      { widthTwips: w, noBorders: true, padV: 0, padH: 0, valign: 'top' }));
+      RULER.reg.drawing(RULER.rId, px, 1, 'column ruler', { tiny: true }) + `</w:p>`,
+      { widthTwips: w, noBorders: true, padV: 0, padH: 0, valign: 'top' }); });
     rowsXml.unshift(`<w:tr><w:trPr><w:trHeight w:val="20" w:hRule="exact"/><w:cantSplit/></w:trPr>${rc.join('')}</w:tr>`);
   }
   return wTable(colWidthsTwips, rowsXml, tableOpts);
