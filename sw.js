@@ -2,7 +2,7 @@
    Strategy: the whole app (HTML + libraries + icons) is precached on first online visit and then
    served from cache first, so it opens instantly and works with no connection at all.
    A fresh copy is fetched quietly in the background whenever there is a connection. */
-const CACHE_VERSION = 'hallmark-qaqc-v15';
+const CACHE_VERSION = 'hallmark-qaqc-v17';
 const CORE = ['./', './index.html', './manifest.webmanifest'];
 const ASSETS = [
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
