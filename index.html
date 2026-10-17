@@ -2290,6 +2290,7 @@ function shrinkImageFile(file, maxDim, asPng) {
 // One "Prove It" space can hold up to 3 photos. They are composed into ONE picture of the exact same fixed size
 // the single photo always had (see composePhotoTile), so row heights and page breaks never change.
 const MAX_PHOTOS = 3;
+const PHOTO_W_PX = 305;   // photo width: fills the "Prove It" cell edge to edge (was 286, which left a wide empty strip each side)
 function pickPhotos(phase) {
   if ((photos[phase] || []).length >= MAX_PHOTOS) {
     showToast('This space is full (maximum ' + MAX_PHOTOS + ' photos). Delete one to add another.', 'error');
@@ -2327,7 +2328,7 @@ const PHOTO_TILES = {};   // phase -> composed data URI (only when 2-3 photos)
 const _tileSig = {};
 async function composePhotoTile(list) {
   const imgs = await Promise.all(list.map(p => _loadImage(p.data)));
-  const S = 4, W = 286 * S, H = 220 * S, B = 1.5 * S, R = 2 * S, G = 4 * S;
+  const S = 4, W = PHOTO_W_PX * S, H = 220 * S, B = 1.5 * S, R = 2 * S, G = 4 * S;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
   g.fillStyle = '#D3D2D4'; g.fillRect(0, 0, W, H);
@@ -2860,7 +2861,7 @@ function generatePDFTemplate(forWord) {
   const TD_LABEL2 = `border:1.5px solid #000; padding:5px 8px; color:#000000; font-size:14.667px; font-weight:normal; text-align:left; vertical-align:middle; background:#ffffff; ${FONT}`;
   const TD_COLHEAD = `border:1.5px solid #000; padding:6px 10px; color:#000000; font-weight:bold; font-size:18.667px; background:#F8D2B8; text-align:center; ${FONT}`;
   const TD_SIGNHEAD = `border:1.5px solid #000; padding:6px 10px; color:#000000; font-weight:bold; font-size:14.667px; background:#5081C1; text-align:center; ${FONT}`;
-  const TD_PROVE = `border:1.5px solid #000; padding:6px 10px; color:#4C4C4D; font-size:12px; background:#D3D2D4; vertical-align:middle; ${FONT}`;
+  const TD_PROVE = `border:1.5px solid #000; padding:6px 4px; color:#4C4C4D; font-size:12px; background:#D3D2D4; vertical-align:middle; ${FONT}`;
   const TD_SUBHEAD = `border:1.5px solid #000; padding:6px 10px; color:#000000; font-weight:bold; font-size:18.667px; text-align:left; background:#5081C1; ${FONT}`;
   const TD_RESHEAD = `border:1.5px solid #000; padding:6px 10px; color:#000000; font-weight:bold; font-size:18.667px; text-align:left; background:#5081C1; ${FONT}`;
   
@@ -2902,14 +2903,14 @@ function generatePDFTemplate(forWord) {
     if (!photo) return `<span style="font-size:12px; line-height:1.35;">${esc(instructionText)}</span>`;
     if (!idx && PHOTO_TILES[photoKey]) {
       // several photos: one composed picture, same box as a single photo (border/corners are drawn into it)
-      if (forWord) return `<img src="${PHOTO_TILES[photoKey]}" width="286" height="220">`;
-      return `<img src="${PHOTO_TILES[photoKey]}" style="width:7.57cm; height:5.82cm; max-width:100%; display:block; margin:0 auto; page-break-inside:avoid; break-inside:avoid;">`;
+      if (forWord) return `<img src="${PHOTO_TILES[photoKey]}" width="${PHOTO_W_PX}" height="220">`;
+      return `<img src="${PHOTO_TILES[photoKey]}" style="width:${PHOTO_W_PX}px; height:5.82cm; max-width:100%; display:block; margin:0 auto; page-break-inside:avoid; break-inside:avoid;">`;
     }
     if (forWord) {
       // Word ignores CSS-only sizing on <img> — use explicit HTML width/height attributes (px equivalent of 7.57cm x 5.82cm at 96dpi)
-      return `<img src="${photo.data}" width="286" height="220" style="object-fit:cover; border:1.5px solid #000;">`;
+      return `<img src="${photo.data}" width="${PHOTO_W_PX}" height="220" style="object-fit:cover; border:1.5px solid #000;">`;
     }
-    return `<img src="${photo.data}" style="width:7.57cm; height:5.82cm; max-width:100%; object-fit:cover; border:1.5px solid #000; border-radius:2px; display:block; margin:0 auto; page-break-inside:avoid; break-inside:avoid;">`;
+    return `<img src="${photo.data}" style="width:${PHOTO_W_PX}px; height:5.82cm; max-width:100%; object-fit:cover; border:1.5px solid #000; border-radius:2px; display:block; margin:0 auto; page-break-inside:avoid; break-inside:avoid;">`;
   };
   
   
@@ -3842,7 +3843,9 @@ async function makeBannerImage() {
   const W = 794, H = 108, S = 4;
   const c = document.createElement('canvas'); c.width = W * S; c.height = H * S;
   const g = c.getContext('2d'); g.scale(S, S);
-  g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+  // Practically transparent (1% white): sits on whatever the page colour is (dark mode, tinted paper). The 1% keeps
+  // the transparent pixels white, so scaling never leaves a dark fringe around the logo plate.
+  g.fillStyle = 'rgba(255,255,255,0.01)'; g.fillRect(0, 0, W, H);
   const barW = W * 0.586, r = 7;
   g.fillStyle = '#FF0000'; g.beginPath();
   g.moveTo(0, 32); g.lineTo(barW - r, 32); g.arcTo(barW, 32, barW, 32 + r, r); g.lineTo(barW, 72 - r); g.arcTo(barW, 72, barW - r, 72, r); g.lineTo(0, 72); g.closePath(); g.fill();
@@ -3918,7 +3921,7 @@ function proveCell(photo, instructionText, rowspan, reg, weights, floors) {
   let contentXml;
   if (photo && photo.data && reg) {
     const rId = reg.registerImage(WORD_PHOTO_CACHE.get(photo.data) || photo.data);
-    contentXml = wPara(reg.drawing(rId, 286, PHOTO_H_PX, 'Evidence photo', { tiny: true }), { align: 'center', markSize: 2 });
+    contentXml = wPara(reg.drawing(rId, PHOTO_W_PX, PHOTO_H_PX, 'Evidence photo', { tiny: true }), { align: 'center', markSize: 2 });
   } else {
     contentXml = wPara(wRun(instructionText || '', { size: 18, color: COLOR.grey }), { align: 'left' });
   }
@@ -3947,7 +3950,7 @@ function proveCell(photo, instructionText, rowspan, reg, weights, floors) {
   // Explicit floors copied from a hand-corrected Word file (row heights the user tightened to
   // natural size in Word itself). They override the computed shares above.
   if (rowspan > 1 && floors && floors.length === rowspan) mergeRowMinTwipsArr = floors.slice();
-  return { colspan: 2, rowspan, shade: COLOR.proveBg, contentXml, mergeRowMinTwipsArr, padV: PADV, padH: 150 };
+  return { colspan: 2, rowspan, shade: COLOR.proveBg, contentXml, mergeRowMinTwipsArr, padV: PADV, padH: 60 };
 }
 
 // ---- table1.js ----
@@ -4421,7 +4424,7 @@ function _roundRectPath(g, x, y, w, h, r) {
 // so the PDF actually STRETCHES every photo to the box. Word is made to do exactly the same.
 async function fitPhotoLikePdf(dataUri) {
   const im = await _loadImage(dataUri);
-  const S = 4, W = 286 * S, H = 220 * S, B = 1.5 * S, R = 2 * S;
+  const S = 4, W = PHOTO_W_PX * S, H = 220 * S, B = 1.5 * S, R = 2 * S;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
   g.fillStyle = '#D3D2D4'; g.fillRect(0, 0, W, H);          // the cell colour shows through the rounded corners
